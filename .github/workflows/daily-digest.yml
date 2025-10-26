@@ -1,0 +1,33 @@
+﻿name: Daily AI News Digest
+
+on:
+  schedule:
+    # Runs at 7 AM Central Time (1:00 PM UTC)
+    - cron: '0 13 * * *'
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  fetch-and-send:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run AI news fetcher
+      env:
+        NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+        HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+        GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      run: |
+        python ai_news_fetcher.py
